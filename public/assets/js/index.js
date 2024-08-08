@@ -3,6 +3,7 @@ let noteTitle;
 let noteText;
 let saveNoteBtn;
 let newNoteBtn;
+let clearBtn;
 let noteList;
 
 if (window.location.pathname === '/notes') {
@@ -11,8 +12,8 @@ if (window.location.pathname === '/notes') {
   noteText = document.querySelector('.note-textarea');
   saveNoteBtn = document.querySelector('.save-note');
   newNoteBtn = document.querySelector('.new-note');
-  clearBtn = document.querySelector('.clear-btn');
-  noteList = document.querySelectorAll('.list-container .list-group');
+  clearBtn = document.querySelector('.clear-btn'); // ADDED CLEAR BUTTON SELECTION
+  noteList = document.querySelector('.list-group'); // FIXED SELECTOR
 }
 
 // Show an element
@@ -77,7 +78,9 @@ const handleNoteSave = () => {
     title: noteTitle.value,
     text: noteText.value
   };
+  console.log('Saving note:', newNote); // LOGGING
   saveNote(newNote).then(() => {
+    console.log('Note saved successfully'); // LOGGING
     getAndRenderNotes();
     renderActiveNote();
   });
@@ -111,27 +114,30 @@ const handleNoteView = (e) => {
 // Sets the activeNote to and empty object and allows the user to enter a new note
 const handleNewNoteView = (e) => {
   activeNote = {};
-  show(clearBtn);
+  show(clearBtn); // SHOW CLEAR BUTTON WHEN CREATING NEW NOTE
   renderActiveNote();
 };
 
 // Renders the appropriate buttons based on the state of the form
 const handleRenderBtns = () => {
-  show(clearBtn);
   if (!noteTitle.value.trim() && !noteText.value.trim()) {
+    hide(saveNoteBtn);
     hide(clearBtn);
   } else if (!noteTitle.value.trim() || !noteText.value.trim()) {
     hide(saveNoteBtn);
+    show(clearBtn); // SHOW CLEAR BUTTON WHEN TEXT OR TITLE EXISTS
   } else {
     show(saveNoteBtn);
+    show(clearBtn); // SHOW BOTH BUTTONS WHEN TEXT AND TITLE EXIST
   }
 };
 
 // Render the list of note titles
 const renderNoteList = async (notes) => {
   let jsonNotes = await notes.json();
+  console.log('Fetched notes:', jsonNotes); // LOGGING
   if (window.location.pathname === '/notes') {
-    noteList.forEach((el) => (el.innerHTML = ''));
+    noteList.innerHTML = ''; // FIXED INNERHTML RESET
   }
 
   let noteListItems = [];
@@ -177,9 +183,10 @@ const renderNoteList = async (notes) => {
   });
 
   if (window.location.pathname === '/notes') {
-    noteListItems.forEach((note) => noteList[0].append(note));
+    noteListItems.forEach((note) => noteList.append(note)); // FIXED APPEND FUNCTION
   }
 };
+
 
 // Gets notes from the db and renders them to the sidebar
 const getAndRenderNotes = () => getNotes().then(renderNoteList);
@@ -187,9 +194,8 @@ const getAndRenderNotes = () => getNotes().then(renderNoteList);
 if (window.location.pathname === '/notes') {
   saveNoteBtn.addEventListener('click', handleNoteSave);
   newNoteBtn.addEventListener('click', handleNewNoteView);
-  clearBtn.addEventListener('click', renderActiveNote);
+  clearBtn.addEventListener('click', handleNewNoteView); // ADDED EVENT LISTENER FOR CLEAR BUTTON
   noteForm.addEventListener('input', handleRenderBtns);
 }
 
 getAndRenderNotes();
-
