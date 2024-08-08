@@ -76,3 +76,13 @@ body {
   padding: 20px;
   cursor: pointer;
 }
+
+.save-note, .new-note, .clear-btn {
+  display: none;
+}
+
+.icons .save-note,
+.icons .new-note,
+.icons .clear-btn {
+  display: inline;
+}
